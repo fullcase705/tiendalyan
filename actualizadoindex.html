@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tienda Lyan · Catálogo a Domicilio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --kraft:#EFE6D6;
+    --kraft-dark:#E3D6BE;
+    --ink:#2B2118;
+    --ink-soft:#5B4C3C;
+    --green:#2F5233;
+    --green-dark:#203a25;
+    --red:#C6432E;
+    --yellow:#F0B93E;
+    --paper:#FFFDF6;
+    --line: rgba(43,33,24,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--kraft);color:var(--ink);font-family:'Inter',sans-serif;}
+  body{
+    background-image:
+      radial-gradient(rgba(43,33,24,0.05) 1px, transparent 1px);
+    background-size: 14px 14px;
+  }
+  a{color:inherit;}
+
+  /* ---------- HEADER ---------- */
+  header{
+    background:var(--green);
+    color:var(--paper);
+    padding:22px 20px 26px;
+    position:relative;
+    border-bottom:6px solid var(--ink);
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:-6px; height:12px;
+    background-image: linear-gradient(135deg, var(--green) 25%, transparent 25%), linear-gradient(225deg, var(--green) 25%, transparent 25%);
+    background-position: 0 0;
+    background-size: 16px 16px;
+    background-color: var(--kraft);
+  }
+  .header-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;}
+  .brand-eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--yellow); font-weight:700; margin-bottom:6px;
+  }
+  h1{
+    font-family:'Archivo Black',sans-serif;
+    font-size:clamp(28px,4.5vw,42px);
+    margin:0 0 6px; line-height:1.02; letter-spacing:-0.01em;
+  }
+  .header-sub{font-size:14px; color:#E9E2D2; max-width:480px;}
+  .header-meta{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px; background:rgba(0,0,0,0.18); border:1px dashed rgba(255,255,255,0.4);
+    padding:10px 14px; border-radius:2px; line-height:1.6; white-space:nowrap;
+  }
+  .header-meta b{color:var(--yellow);}
+
+  /* ---------- CONTROLS ---------- */
+  .controls{
+    max-width:1100px; margin:-18px auto 0; padding:0 20px; position:relative; z-index:2;
+  }
+  .search-row{
+    background:var(--paper); border:2px solid var(--ink); border-radius:4px;
+    display:flex; align-items:center; padding:4px 4px 4px 14px; gap:8px;
+    box-shadow:4px 4px 0 var(--ink);
+  }
+  .search-row svg{flex:none;}
+  .search-row input{
+    border:none; outline:none; background:transparent; flex:1;
+    font-family:'Inter',sans-serif; font-size:15px; padding:11px 4px; color:var(--ink);
+  }
+  .search-row input::placeholder{color:var(--ink-soft); opacity:.7;}
+  .clear-btn{
+    border:none; background:var(--kraft-dark); color:var(--ink); font-size:12px; font-weight:700;
+    padding:9px 12px; border-radius:2px; cursor:pointer; font-family:'JetBrains Mono',monospace;
+    display:none;
+  }
+  .clear-btn.show{display:inline-block;}
+
+  .chips{
+    display:flex; gap:8px; overflow-x:auto; padding:16px 0 6px; scrollbar-width:thin;
+  }
+  .chip{
+    flex:none; font-family:'JetBrains Mono',monospace; font-size:12.5px; font-weight:600;
+    padding:8px 14px; border-radius:20px; border:1.5px solid var(--ink); background:var(--paper);
+    cursor:pointer; white-space:nowrap; transition:all .15s ease; color:var(--ink);
+  }
+  .chip:hover{transform:translateY(-1px);}
+  .chip.active{background:var(--ink); color:var(--yellow); border-color:var(--ink);}
+  .chip .count{opacity:.55; margin-left:4px;}
+
+  /* ---------- GRID ---------- */
+  main{max-width:1100px; margin:0 auto; padding:10px 20px 120px;}
+  .cat-heading{
+    font-family:'Archivo Black',sans-serif; font-size:15px; text-transform:uppercase;
+    letter-spacing:.03em; margin:26px 0 12px; padding-bottom:6px; border-bottom:2px solid var(--ink);
+    display:flex; align-items:center; gap:8px;
+  }
+  .cat-heading span.tag{
+    background:var(--yellow); color:var(--ink); font-family:'JetBrains Mono',monospace;
+    font-size:11px; padding:2px 7px; border-radius:2px; font-weight:700;
+  }
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px;
+  }
+  .card{
+    background:var(--paper); border:1.5px solid var(--ink); border-radius:3px;
+    padding:12px 12px 10px; position:relative; display:flex; flex-direction:column; gap:8px;
+    transition:box-shadow .18s ease, transform .18s ease;
+    animation:cardIn .22s ease both;
+  }
+  @keyframes cardIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  .card:hover{box-shadow:3px 3px 0 var(--ink); transform:translate(-2px,-2px);}
+  .card-media{
+    width:100%; aspect-ratio:1.5/1; border-radius:3px; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:38px;
+    background:var(--icon-bg, var(--kraft-dark)); position:relative; overflow:hidden;
+  }
+  .card-media::after{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35), transparent 60%);
+  }
+  .card-media span{position:relative; z-index:1; transition:transform .25s ease;}
+  .card:hover .card-media span{transform:scale(1.15) rotate(-4deg);}
+  .card-name{font-weight:700; font-size:14px; line-height:1.25; min-height:36px;}
+  .card-pres{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft);
+    text-transform:uppercase; letter-spacing:.02em;
+  }
+  .card-bottom{display:flex; align-items:center; justify-content:space-between; margin-top:auto; gap:8px;}
+  .price{
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:16px; color:var(--red);
+    background:repeating-linear-gradient(-6deg, transparent, transparent 2px);
+  }
+  .price small{font-size:10px; font-weight:400; color:var(--ink-soft); display:block; margin-top:-2px;}
+
+  .stepper{display:flex; align-items:center; gap:0; border:1.5px solid var(--ink); border-radius:3px; overflow:hidden;}
+  .stepper button{
+    width:26px; height:26px; border:none; background:var(--kraft-dark); color:var(--ink); font-size:16px;
+    cursor:pointer; font-family:'JetBrains Mono',monospace; line-height:1;
+  }
+  .stepper button:active{background:var(--yellow);}
+  .stepper .qty{width:26px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700;}
+  .add-btn{
+    background:var(--green); color:var(--paper); border:none; padding:7px 12px; border-radius:3px;
+    font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; cursor:pointer;
+    text-transform:uppercase; letter-spacing:.02em; transition:transform .12s ease;
+  }
+  .add-btn:hover{background:var(--green-dark);}
+  .add-btn:active{transform:scale(.92);}
+  .stepper button{transition:transform .1s ease;}
+  .stepper button:active{transform:scale(.85);}
+
+  @keyframes cartPulse{
+    0%{transform:scale(1);}
+    35%{transform:scale(1.28);}
+    60%{transform:scale(.95);}
+    100%{transform:scale(1);}
+  }
+  .cart-fab.pulse{animation:cartPulse .38s ease;}
+  .cart-fab .badge{transition:transform .15s ease;}
+
+  @keyframes flyIcon{
+    0%{opacity:1; transform:translate(0,0) scale(1);}
+    100%{opacity:0; transform:var(--fly-to) scale(.3);}
+  }
+  .flying-icon{
+    position:fixed; z-index:90; font-size:26px; pointer-events:none;
+    animation:flyIcon .55s cubic-bezier(.25,.6,.35,1) forwards;
+  }
+
+  .toast{
+    position:fixed; left:50%; bottom:90px; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--yellow); font-family:'JetBrains Mono',monospace; font-size:12.5px;
+    font-weight:700; padding:10px 18px; border-radius:20px; z-index:55; opacity:0; pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease; white-space:nowrap;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  .no-results{
+    text-align:center; padding:60px 20px; color:var(--ink-soft); font-family:'JetBrains Mono',monospace;
+  }
+
+  /* ---------- CART FAB ---------- */
+  .cart-fab{
+    position:fixed; right:18px; bottom:18px; z-index:50;
+    background:var(--red); color:var(--paper); border:2px solid var(--ink);
+    border-radius:40px; padding:14px 20px; display:flex; align-items:center; gap:10px;
+    cursor:pointer; box-shadow:4px 4px 0 var(--ink); font-family:'JetBrains Mono',monospace;
+    font-weight:700; font-size:14px;
+  }
+  .cart-fab:active{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--ink);}
+  .cart-fab .badge{
+    background:var(--yellow); color:var(--ink); border-radius:50%; width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+
+  /* ---------- DRAWER (libreta de pedido) ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(20,15,10,0.45); z-index:60; opacity:0; pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .overlay.open{opacity:1; pointer-events:auto;}
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:min(400px,100vw); z-index:61;
+    background:var(--paper); transform:translateX(100%); transition:transform .25s ease;
+    display:flex; flex-direction:column; border-left:3px solid var(--ink);
+    background-image: repeating-linear-gradient(var(--paper) 0 27px, var(--line) 27px 28px);
+  }
+  .drawer.open{transform:translateX(0);}
+  .drawer-head{
+    background:var(--ink); color:var(--yellow); padding:16px 18px; display:flex; justify-content:space-between; align-items:center;
+    font-family:'Archivo Black',sans-serif; font-size:16px; flex:none;
+  }
+  .drawer-head button{background:none; border:none; color:var(--paper); font-size:22px; cursor:pointer; line-height:1;}
+  .drawer-sub{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); padding:10px 18px 0;
+    flex:none;
+  }
+  .drawer-items{flex:1; overflow-y:auto; padding:10px 18px;}
+  .drawer-empty{color:var(--ink-soft); font-family:'JetBrains Mono',monospace; font-size:13px; padding:30px 0; text-align:center;}
+  .drawer-item{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:6px 0; border-bottom:1px dashed var(--line);}
+  .di-name{font-size:13px; font-weight:600; flex:1; line-height:1.2;}
+  .di-pres{font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-soft);}
+  .di-right{display:flex; align-items:center; gap:8px; flex:none;}
+  .di-price{font-family:'JetBrains Mono',monospace; font-size:12.5px; font-weight:700;}
+  .di-remove{background:none; border:none; color:var(--red); font-size:16px; cursor:pointer; padding:0 2px;}
+
+  .drawer-foot{
+    flex:none; border-top:2px dashed var(--ink); padding:14px 18px 18px; background:var(--kraft);
+  }
+  .total-row{display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:14px; margin-bottom:4px;}
+  .total-row.grand{font-size:19px; font-weight:700; border-top:1px solid var(--ink); padding-top:8px; margin-top:6px;}
+  .field{margin-top:10px;}
+  .field label{font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); display:block; margin-bottom:4px;}
+  .field input, .field select{
+    width:100%; padding:9px 10px; border:1.5px solid var(--ink); border-radius:3px; font-family:'Inter',sans-serif;
+    font-size:13px; background:var(--paper);
+  }
+  .send-btn{
+    width:100%; margin-top:14px; background:#25D366; color:#0b3d1f; border:2px solid var(--ink);
+    padding:13px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:14px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .send-btn:disabled{opacity:.5; cursor:not-allowed;}
+  .send-btn:active:not(:disabled){transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink);}
+
+  footer{
+    text-align:center; padding:24px 20px 40px; font-family:'JetBrains Mono',monospace; font-size:11px;
+    color:var(--ink-soft);
+  }
+  .admin-link{
+    background:none; border:none; color:var(--ink-soft); font-family:'JetBrains Mono',monospace;
+    font-size:11px; cursor:pointer; text-decoration:underline; padding:0; margin-top:6px;
+  }
+
+  /* ---------- ADMIN PIN MODAL ---------- */
+  .pin-modal{
+    position:fixed; inset:0; background:rgba(20,15,10,0.55); z-index:80; display:none;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .pin-modal.open{display:flex;}
+  .pin-box{
+    background:var(--paper); border:2px solid var(--ink); border-radius:4px; padding:24px;
+    width:100%; max-width:280px; box-shadow:5px 5px 0 var(--ink); text-align:center;
+  }
+  .pin-box h3{font-family:'Archivo Black',sans-serif; font-size:16px; margin:0 0 4px;}
+  .pin-box p{font-size:12px; color:var(--ink-soft); margin:0 0 14px;}
+  .pin-box input{
+    width:100%; text-align:center; letter-spacing:.5em; font-size:20px; padding:10px;
+    border:1.5px solid var(--ink); border-radius:3px; font-family:'JetBrains Mono',monospace;
+  }
+  .pin-error{color:var(--red); font-size:11px; font-family:'JetBrains Mono',monospace; height:16px; margin-top:6px;}
+  .pin-actions{display:flex; gap:8px; margin-top:12px;}
+  .pin-actions button{
+    flex:1; padding:10px; border-radius:3px; font-family:'JetBrains Mono',monospace; font-weight:700;
+    font-size:12px; cursor:pointer; border:1.5px solid var(--ink);
+  }
+  .pin-cancel{background:var(--kraft-dark); color:var(--ink);}
+  .pin-submit{background:var(--ink); color:var(--yellow);}
+
+  /* ---------- ADMIN PANEL ---------- */
+  .admin-panel{
+    position:fixed; inset:0; background:var(--kraft); z-index:75; display:none;
+    flex-direction:column; overflow:hidden;
+  }
+  .admin-panel.open{display:flex;}
+  .admin-head{
+    background:var(--ink); color:var(--yellow); padding:16px 20px; display:flex; justify-content:space-between;
+    align-items:center; flex:none;
+  }
+  .admin-head h2{font-family:'Archivo Black',sans-serif; font-size:18px; margin:0;}
+  .admin-head button{background:var(--red); color:var(--paper); border:none; padding:8px 14px; border-radius:3px;
+    font-family:'JetBrains Mono',monospace; font-weight:700; cursor:pointer; font-size:12px;}
+  .admin-summary{
+    display:flex; gap:12px; padding:14px 20px; flex-wrap:wrap; flex:none; background:var(--kraft-dark);
+    border-bottom:2px solid var(--ink);
+  }
+  .admin-summary .stat{
+    background:var(--paper); border:1.5px solid var(--ink); border-radius:3px; padding:8px 14px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .admin-summary .stat .n{font-size:16px; font-weight:700;}
+  .admin-summary .stat .l{font-size:10px; color:var(--ink-soft); text-transform:uppercase;}
+  .admin-body{flex:1; overflow:auto; padding:10px 20px 40px;}
+  table.admin-table{width:100%; border-collapse:collapse; font-size:13px; background:var(--paper);}
+  table.admin-table th{
+    text-align:left; font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase;
+    color:var(--ink-soft); padding:8px 10px; border-bottom:2px solid var(--ink); position:sticky; top:0; background:var(--paper);
+  }
+  table.admin-table td{padding:7px 10px; border-bottom:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:12.5px;}
+  table.admin-table tr:hover td{background:var(--kraft-dark);}
+  table.admin-table td.name-col{font-family:'Inter',sans-serif; font-weight:600;}
+  .cat-row td{background:var(--yellow); font-weight:700; font-family:'JetBrains Mono',monospace; padding:6px 10px;}
+  .profit-pos{color:var(--green-dark); font-weight:700;}
+
+  @media (max-width:520px){
+    .header-inner{flex-direction:column; align-items:flex-start;}
+    .header-meta{white-space:normal;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="brand-eyebrow">Pedidos a domicilio</div>
+      <h1>Tienda Lyan</h1>
+      <div class="header-sub">Tus marcas de siempre, al precio justo. Arma tu pedido y lo enviamos por WhatsApp.</div>
+    </div>
+    <div class="header-meta">
+      📲 Pedidos: <b>323 673 9935</b><br>
+      Precios sujetos a disponibilidad
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-row">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2B2118" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" type="text" placeholder="Buscar producto… ej: café, detergente, aceite">
+    <button class="clear-btn" id="clearBtn">LIMPIAR</button>
+  </div>
+  <div class="chips" id="chips"></div>
+</div>
+
+<main id="main"></main>
+
+<div class="cart-fab" id="cartFab">
+  🧺 Pedido <span class="badge" id="cartCount">0</span>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <span>📒 Libreta de pedido</span>
+    <button id="closeDrawer">&times;</button>
+  </div>
+  <div class="drawer-sub" id="drawerSub">0 productos</div>
+  <div class="drawer-items" id="drawerItems"></div>
+  <div class="drawer-foot">
+    <div class="total-row grand"><span>Total</span><span id="totalAmount">$0</span></div>
+    <div class="field">
+      <label>Tu nombre</label>
+      <input id="custName" type="text" placeholder="Ej: María Pérez">
+    </div>
+    <div class="field">
+      <label>Dirección de entrega</label>
+      <input id="custAddr" type="text" placeholder="Barrio, calle, número">
+    </div>
+    <button class="send-btn" id="sendBtn" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#0b3d1f"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.7 1.4 5.3L2 22l4.9-1.3c1.5.8 3.3 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3C4.4 15 4 13.5 4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8z"/></svg>
+      Enviar pedido por WhatsApp
+    </button>
+  </div>
+</div>
+
+<footer>
+  Catálogo generado a partir del folleto vigente · precios sujetos a disponibilidad en cada sede<br>
+  <button class="admin-link" id="adminLink">🔒 Acceso vendedor</button>
+</footer>
+
+<!-- PIN MODAL -->
+<div class="pin-modal" id="pinModal">
+  <div class="pin-box">
+    <h3>Acceso vendedor</h3>
+    <p>Ingresa el PIN para ver costos y utilidades</p>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
+    <div class="pin-error" id="pinError"></div>
+    <div class="pin-actions">
+      <button class="pin-cancel" id="pinCancel">Cancelar</button>
+      <button class="pin-submit" id="pinSubmit">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-head">
+    <h2>📊 Panel del vendedor</h2>
+    <button id="adminClose">Cerrar</button>
+  </div>
+  <div class="admin-summary" id="adminSummary"></div>
+  <div class="admin-body">
+    <table class="admin-table" id="adminTable"></table>
+  </div>
+</div>
+
+<script>
+// ---------- DATA ----------
+const PRODUCTS = [
+// Licores
+{id:'l1',cat:'Licores',name:'Whisky Chivas Regal 12 años',pres:'700 ml',cost:94500,price:132300},
+{id:'l2',cat:'Licores',name:'Whisky Chivas Regal 13 años',pres:'700 ml',cost:102950,price:144130},
+{id:'l3',cat:'Licores',name:'Tequila Olmeca Reposado',pres:'700 ml',cost:65200,price:91280},
+{id:'l4',cat:'Licores',name:'Whisky Something Special',pres:'750 ml',cost:56050,price:78470},
+{id:'l5',cat:'Licores',name:'Tequila Olmeca Blanco',pres:'700 ml',cost:66550,price:93170},
+{id:'l6',cat:'Licores',name:'Whisky Glenlivet Founder',pres:'700 ml',cost:112850,price:157990},
+{id:'l7',cat:'Licores',name:'Tequila Olmeca Blanco',pres:'350 ml',cost:35250,price:49350},
+{id:'l8',cat:'Licores',name:'Tequila Olmeca Reposado',pres:'350 ml',cost:34500,price:48300},
+{id:'l9',cat:'Licores',name:'Aguardiente Antioqueño S/A Verde + 2 Poker 330ml gratis',pres:'750 ml',cost:46000,price:64400},
+{id:'l10',cat:'Licores',name:'Aguardiente Antioqueño S/A Azul + 2 Poker 330ml gratis',pres:'750 ml',cost:48000,price:67200},
+{id:'l11',cat:'Licores',name:'Licor de Ron Medellín',pres:'750 ml',cost:32400,price:45360},
+{id:'l12',cat:'Licores',name:'Ron Medellín 5 Años',pres:'750 ml',cost:46250,price:64750},
+{id:'l13',cat:'Licores',name:'Tequila Patrón Silver',pres:'700 ml',cost:157850,price:220990},
+{id:'l14',cat:'Licores',name:'Tequila Patrón Cristalino',pres:'700 ml',cost:183350,price:256690},
+// Dulces y bebidas
+{id:'d1',cat:'Dulces y Bebidas',name:'Masmelos Chocolixie',pres:'125 gr',cost:1700,price:2380},
+{id:'d2',cat:'Dulces y Bebidas',name:'Masmelos Chocolixie',pres:'500 gr',cost:6650,price:9310},
+{id:'d3',cat:'Dulces y Bebidas',name:'Masmelos Chocolixie',pres:'8x12 · 480 g',cost:6350,price:8890},
+{id:'d4',cat:'Dulces y Bebidas',name:'Gelatina Gelhada surtida',pres:'3x35 g',cost:3650,price:5110},
+{id:'d5',cat:'Dulces y Bebidas',name:'Goma Grisly surtida',pres:'40-45 g',cost:950,price:1330},
+{id:'d6',cat:'Dulces y Bebidas',name:'Goma Grisly surtida',pres:'50-72 g',cost:1350,price:1890},
+{id:'d7',cat:'Dulces y Bebidas',name:'Jugo Hit surtido',pres:'12x500 ml',cost:24000,price:33600},
+{id:'d8',cat:'Dulces y Bebidas',name:'Chocolate Luker tradicional',pres:'224 gr',cost:13500,price:18900},
+{id:'d9',cat:'Dulces y Bebidas',name:'Galleta Festival surtida',pres:'6x12 und',cost:10650,price:14910},
+{id:'d10',cat:'Dulces y Bebidas',name:'Galletas Mi Día saladas',pres:'282 g · 3 tacos',cost:3050,price:4270},
+// Abarrotes
+{id:'a1',cat:'Abarrotes',name:'Café Nescafé Tradición',pres:'170 g',cost:26150,price:36610},
+{id:'a2',cat:'Abarrotes',name:'Café Aroma molido',pres:'400 g',cost:15850,price:22190},
+{id:'a3',cat:'Abarrotes',name:'Café Sello Rojo',pres:'500 gr',cost:21350,price:29890},
+{id:'a4',cat:'Abarrotes',name:'Café Bemoka selección especial',pres:'400 g',cost:14550,price:20370},
+{id:'a5',cat:'Abarrotes',name:'Café Bemoka selección especial',pres:'125 g',cost:5100,price:7140},
+{id:'a6',cat:'Abarrotes',name:'Café Bemoka selección especial',pres:'250 g',cost:10600,price:14840},
+{id:'a7',cat:'Abarrotes',name:'Café Bemoka selección especial',pres:'50g x25 und',cost:46300,price:64820},
+{id:'a8',cat:'Abarrotes',name:'Café Águila Roja',pres:'1000 g',cost:36850,price:51590},
+{id:'a9',cat:'Abarrotes',name:'Harina Doñarepa Amarilla',pres:'1 kg',cost:3100,price:4340},
+{id:'a10',cat:'Abarrotes',name:'Harina Doñarepa Blanca',pres:'1 kg',cost:2800,price:3920},
+{id:'a11',cat:'Abarrotes',name:'Salsa de Tomate San Jorge',pres:'600 gr',cost:8250,price:11550},
+{id:'a12',cat:'Abarrotes',name:'Salsa de Tomate Fruco',pres:'80g x12 und',cost:15300,price:21420},
+{id:'a13',cat:'Abarrotes',name:'Mayonesa San Jorge',pres:'600 gr',cost:10400,price:14560},
+{id:'a14',cat:'Abarrotes',name:'Mayonesa Fruco',pres:'1000 gr',cost:17000,price:23800},
+{id:'a15',cat:'Abarrotes',name:'Hojuela Sunshine Natural',pres:'220 g maíz',cost:2650,price:3710},
+{id:'a16',cat:'Abarrotes',name:'Hojuela Sunshine surtida',pres:'8x30 g',cost:5750,price:8050},
+{id:'a17',cat:'Abarrotes',name:'Hojuela Sunshine azucarada',pres:'300 g maíz',cost:4150,price:5810},
+{id:'a18',cat:'Abarrotes',name:'Colada Toning surtida',pres:'1000 gr',cost:11900,price:16660},
+{id:'a19',cat:'Abarrotes',name:'Granola Toning sin gluten',pres:'450 gr',cost:10400,price:14560},
+{id:'a20',cat:'Abarrotes',name:'Cereal Kellogg\'s Zucaritas / Choco Krispis',pres:'115g / 95g',cost:3990,price:5586},
+{id:'a21',cat:'Abarrotes',name:'Arroz Doña Leo',pres:'25x500 g',cost:35900,price:50260},
+{id:'a22',cat:'Abarrotes',name:'Pasta La Muñeca surtida',pres:'1000 gr',cost:4600,price:6440},
+{id:'a23',cat:'Abarrotes',name:'Pasta La Muñeca cabello de ángel',pres:'250 gr',cost:1500,price:2100},
+{id:'a24',cat:'Abarrotes',name:'Pasta Rioka surtida',pres:'250 g',cost:850,price:1190},
+{id:'a25',cat:'Abarrotes',name:'Aceite Oleocali',pres:'3000 ml',cost:27950,price:39130},
+{id:'a26',cat:'Abarrotes',name:'Aceite Oleocali',pres:'900 ml',cost:8550,price:11970},
+{id:'a27',cat:'Abarrotes',name:'Aceite Olivetto extra virgen multivarietal',pres:'225 ml',cost:13800,price:19320},
+{id:'a28',cat:'Abarrotes',name:'Aceite Olivetto extra virgen multivarietal',pres:'450 ml',cost:26700,price:37380},
+{id:'a29',cat:'Abarrotes',name:'Aceite Premier',pres:'1800 cc',cost:24350,price:34090},
+{id:'a30',cat:'Abarrotes',name:'Aceite Premier',pres:'4500 cc',cost:63250,price:88550},
+{id:'a31',cat:'Abarrotes',name:'Aceite Gourmet multiusos',pres:'1800 ml',cost:31050,price:43470},
+{id:'a32',cat:'Abarrotes',name:'Aceite Gourmet familia',pres:'2600 ml',cost:46800,price:65520},
+{id:'a33',cat:'Abarrotes',name:'Atún La Soberana en trozos',pres:'120 g',cost:4100,price:5740},
+{id:'a34',cat:'Abarrotes',name:'Atún La Soberana en trozos pack ahorro',pres:'120g x2 und',cost:7500,price:10500},
+{id:'a35',cat:'Abarrotes',name:'Maíz Tierno San Jorge',pres:'2x190 gr',cost:8550,price:11970},
+{id:'a36',cat:'Abarrotes',name:'Arveja con Zanahoria San Jorge',pres:'280 gr',cost:4050,price:5670},
+{id:'a37',cat:'Abarrotes',name:'Leche Proleche larga vida entera',pres:'6x1000 ml',cost:21900,price:30660},
+{id:'a38',cat:'Abarrotes',name:'Margarina La Fina Suave',pres:'125 gr',cost:2100,price:2940},
+{id:'a39',cat:'Abarrotes',name:'Margarina Campi Sal',pres:'500 gr',cost:11450,price:16030},
+{id:'a40',cat:'Abarrotes',name:'Margarina Campi Sal',pres:'250 gr',cost:6400,price:8960},
+{id:'a41',cat:'Abarrotes',name:'Margarina Practis con sal',pres:'400 gr',cost:5200,price:7280},
+{id:'a42',cat:'Abarrotes',name:'Margarina Practis con sal',pres:'200 gr',cost:2750,price:3850},
+{id:'a43',cat:'Abarrotes',name:'Tostado Mamipan',pres:'10 paq x5 und',cost:12300,price:17220},
+{id:'a44',cat:'Abarrotes',name:'Jamón Panceta',pres:'500 gr',cost:8150,price:11410},
+{id:'a45',cat:'Abarrotes',name:'Tocineta Panceta ahumada',pres:'450 gr',cost:7200,price:10080},
+// Aseo del hogar
+{id:'h1',cat:'Aseo del Hogar',name:'Jabón en Barra Puro Azul',pres:'215 g',cost:1100,price:1540},
+{id:'h2',cat:'Aseo del Hogar',name:'Limpiapisos Blancox surtido',pres:'1500 ml',cost:8450,price:11830},
+{id:'h3',cat:'Aseo del Hogar',name:'Limpiapisos Blancox',pres:'1800 ml',cost:11050,price:15470},
+{id:'h4',cat:'Aseo del Hogar',name:'Limpiador Blancox multiusos bicarbonato',pres:'1.8 l',cost:11600,price:16240},
+{id:'h5',cat:'Aseo del Hogar',name:'Lavaloza Lozacrem surtido',pres:'1500 ml',cost:10900,price:15260},
+{id:'h6',cat:'Aseo del Hogar',name:'Detergente Top jeans y ropa oscura',pres:'1800 ml',cost:10350,price:14490},
+{id:'h7',cat:'Aseo del Hogar',name:'Detergente Top ropa de color',pres:'1800 ml',cost:11250,price:15750},
+{id:'h8',cat:'Aseo del Hogar',name:'Suavizante Limpiaya',pres:'1000 ml',cost:3200,price:4480},
+{id:'h9',cat:'Aseo del Hogar',name:'Esponja Limpiaya doble uso',pres:'24 und',cost:10150,price:14210},
+{id:'h10',cat:'Aseo del Hogar',name:'Jabón Líquido Rey barra líquida',pres:'2000 ml',cost:14700,price:20580},
+{id:'h11',cat:'Aseo del Hogar',name:'Limpiador Limpiaya multiusos citronela',pres:'2000 ml',cost:5050,price:7070},
+{id:'h12',cat:'Aseo del Hogar',name:'Papel Higiénico Elite ultrasuave',pres:'12 und',cost:16700,price:23380},
+{id:'h13',cat:'Aseo del Hogar',name:'Papel Higiénico Elite suave y resistente',pres:'12 und',cost:10450,price:14630},
+{id:'h14',cat:'Aseo del Hogar',name:'Papel Higiénico Elite dúo',pres:'6 und',cost:9600,price:13440},
+{id:'h15',cat:'Aseo del Hogar',name:'Detergente Fab Ultra Flash',pres:'700 gr',cost:5600,price:7840},
+{id:'h16',cat:'Aseo del Hogar',name:'Detergente Fab Ultra Flash',pres:'450 gr',cost:4100,price:5740},
+{id:'h17',cat:'Aseo del Hogar',name:'Detergente Supremo OxiMax',pres:'1000 g',cost:5750,price:8050},
+{id:'h18',cat:'Aseo del Hogar',name:'Detergente Supremo OxiMax',pres:'500 g',cost:3150,price:4410},
+{id:'h19',cat:'Aseo del Hogar',name:'Detergente Ariel líquido Revitacolor',pres:'1.8 lt',cost:22850,price:31990},
+{id:'h20',cat:'Aseo del Hogar',name:'Detergente Ariel en polvo triple poder',pres:'2 kg',cost:19300,price:27020},
+{id:'h21',cat:'Aseo del Hogar',name:'Detergente Dersa elimina 5 malos olores',pres:'2000 g',cost:15200,price:21280},
+{id:'h22',cat:'Aseo del Hogar',name:'Detergente Dersa doble poder',pres:'3000 gr',cost:15250,price:21350},
+// Cuidado personal y bebé
+{id:'p1',cat:'Cuidado Personal y Bebé',name:'Pañal Babysec Ultra Protect',pres:'30 und',cost:23250,price:32550},
+{id:'p2',cat:'Cuidado Personal y Bebé',name:'Máquina de Afeitar Gillette Prostobarbe Ultragrip3',pres:'12 und',cost:17750,price:24850},
+{id:'p3',cat:'Cuidado Personal y Bebé',name:'Acondicionador Sedal Toque de Seda',pres:'250 ml',cost:9450,price:13230},
+{id:'p4',cat:'Cuidado Personal y Bebé',name:'Máquina de Afeitar Venus Simply',pres:'8 und',cost:28550,price:39970},
+{id:'p5',cat:'Cuidado Personal y Bebé',name:'Desodorante Dove Orquídea y Açaí',pres:'45 g',cost:15450,price:21630},
+{id:'p6',cat:'Cuidado Personal y Bebé',name:'Desodorante Dove Roll On Original',pres:'30 ml',cost:2650,price:3710},
+{id:'p7',cat:'Cuidado Personal y Bebé',name:'Pañal Bebex mediano',pres:'30 und',cost:16300,price:22820},
+// Mascotas
+{id:'m1',cat:'Mascotas',name:'Alimento QidaCat',pres:'500 g',cost:4250,price:5950},
+{id:'m2',cat:'Mascotas',name:'Alimento QidaCat',pres:'8 kg',cost:65600,price:91840},
+{id:'m3',cat:'Mascotas',name:'Arena Sanitaria Cool Cat',pres:'20 kg',cost:38700,price:54180},
+{id:'m4',cat:'Mascotas',name:'Arena Sanitaria Cool Cat',pres:'4.5 kg',cost:9400,price:13160},
+{id:'m5',cat:'Mascotas',name:'Alimento Nutrecan cachorro',pres:'500 g',cost:3500,price:4900},
+{id:'m6',cat:'Mascotas',name:'Alimento Nutrecan adulto croquetas',pres:'800 g',cost:4800,price:6720},
+];
+
+const CATS = [...new Set(PRODUCTS.map(p=>p.cat))];
+const fmt = n => '$' + n.toLocaleString('es-CO');
+
+// ---------- ICONS ----------
+const CAT_COLORS = {
+  'Licores':'#EAD9B8', 'Dulces y Bebidas':'#F6D6D6', 'Abarrotes':'#F1E3C2',
+  'Aseo del Hogar':'#CFE3E8', 'Cuidado Personal y Bebé':'#E3D6EC', 'Mascotas':'#D9E8CE'
+};
+const KEYWORD_ICONS = [
+  [/whisky/i,'🥃'],[/tequila/i,'🥃'],[/ron\b|licor de ron/i,'🥃'],[/aguardiente/i,'🥃'],
+  [/café/i,'☕'],[/jugo/i,'🧃'],[/chocolate/i,'🍫'],[/masmelo|gelatina|goma|dulce/i,'🍬'],
+  [/galleta/i,'🍪'],[/aceite/i,'🫒'],[/arroz/i,'🍚'],[/pasta/i,'🍝'],[/atún/i,'🐟'],
+  [/leche/i,'🥛'],[/margarina|mayonesa/i,'🧈'],[/salsa/i,'🍅'],[/harina|arepa/i,'🫓'],
+  [/maíz/i,'🌽'],[/arveja/i,'🫛'],[/jamón|tocineta|panceta/i,'🥓'],[/cereal|hojuela|granola|colada/i,'🥣'],
+  [/tostado/i,'🍞'],[/jabón|detergente|suavizante/i,'🧺'],[/limpia|lavaloza|lozacrem/i,'🧽'],
+  [/papel higiénico/i,'🧻'],[/desodorante/i,'🧴'],[/acondicionador/i,'🧴'],[/máquina/i,'🪒'],
+  [/pañal/i,'👶'],[/gato|cat\b/i,'🐱'],[/perro|can\b|nutrecan/i,'🐶'],[/arena/i,'🐾'],
+];
+function getIcon(p){
+  const hit = KEYWORD_ICONS.find(([re])=>re.test(p.name));
+  if(hit) return hit[1];
+  const fallback = {'Licores':'🍾','Dulces y Bebidas':'🍭','Abarrotes':'🛒',
+    'Aseo del Hogar':'🧼','Cuidado Personal y Bebé':'🧴','Mascotas':'🐾'};
+  return fallback[p.cat] || '📦';
+}
+
+// ---------- STATE ----------
+let activeCat = 'Todos';
+let query = '';
+let cart = {}; // id -> qty
+
+// ---------- RENDER CHIPS ----------
+const chipsEl = document.getElementById('chips');
+function renderChips(){
+  const all = ['Todos', ...CATS];
+  chipsEl.innerHTML = all.map(c=>{
+    const count = c==='Todos' ? PRODUCTS.length : PRODUCTS.filter(p=>p.cat===c).length;
+    return `<button class="chip ${c===activeCat?'active':''}" data-cat="${c}">${c} <span class="count">${count}</span></button>`;
+  }).join('');
+  chipsEl.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ activeCat = btn.dataset.cat; renderChips(); renderGrid(); });
+  });
+}
+
+// ---------- RENDER GRID ----------
+const mainEl = document.getElementById('main');
+function renderGrid(){
+  const q = query.trim().toLowerCase();
+  let filtered = PRODUCTS.filter(p=>{
+    const matchCat = activeCat==='Todos' || p.cat===activeCat;
+    const matchQ = !q || (p.name.toLowerCase()+' '+p.pres.toLowerCase()).includes(q);
+    return matchCat && matchQ;
+  });
+
+  if(filtered.length===0){
+    mainEl.innerHTML = `<div class="no-results">No encontramos productos para "${query}".<br>Prueba con otra palabra.</div>`;
+    return;
+  }
+
+  // group by category, preserving CATS order
+  const groups = {};
+  filtered.forEach(p=>{ (groups[p.cat] = groups[p.cat]||[]).push(p); });
+
+  let html = '';
+  Object.keys(groups).forEach(cat=>{
+    html += `<div class="cat-heading">${cat} <span class="tag">${groups[cat].length}</span></div>`;
+    html += `<div class="grid">`;
+    groups[cat].forEach(p=>{
+      const qty = cart[p.id] || 0;
+      html += `
+        <div class="card" data-id="${p.id}">
+          <div class="card-media" style="--icon-bg:${CAT_COLORS[p.cat]||'var(--kraft-dark)'}"><span>${getIcon(p)}</span></div>
+          <div class="card-name">${p.name}</div>
+          <div class="card-pres">${p.pres}</div>
+          <div class="card-bottom">
+            <div class="price">${fmt(p.price)}</div>
+            ${qty===0
+              ? `<button class="add-btn" data-add="${p.id}">Agregar</button>`
+              : `<div class="stepper">
+                   <button data-dec="${p.id}">−</button>
+                   <div class="qty">${qty}</div>
+                   <button data-inc="${p.id}">+</button>
+                 </div>`
+            }
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  mainEl.innerHTML = html;
+
+  mainEl.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click', (e)=>{
+    changeQty(b.dataset.add, 1);
+    flyToCart(e.currentTarget, getIcon(PRODUCTS.find(p=>p.id===b.dataset.add)));
+    showToast('Agregado al pedido ✅');
+  }));
+  mainEl.querySelectorAll('[data-inc]').forEach(b=>b.addEventListener('click', (e)=>{
+    changeQty(b.dataset.inc, 1);
+    flyToCart(e.currentTarget, getIcon(PRODUCTS.find(p=>p.id===b.dataset.inc)));
+  }));
+  mainEl.querySelectorAll('[data-dec]').forEach(b=>b.addEventListener('click', ()=>changeQty(b.dataset.dec, -1)));
+}
+
+function changeQty(id, delta){
+  const next = (cart[id]||0) + delta;
+  if(next<=0){ delete cart[id]; } else { cart[id]=next; }
+  renderGrid();
+  renderCart();
+}
+
+// ---------- CART / DRAWER ----------
+const cartFab = document.getElementById('cartFab');
+const overlay = document.getElementById('overlay');
+const drawer = document.getElementById('drawer');
+const closeDrawer = document.getElementById('closeDrawer');
+const cartCount = document.getElementById('cartCount');
+const drawerItems = document.getElementById('drawerItems');
+const drawerSub = document.getElementById('drawerSub');
+const totalAmount = document.getElementById('totalAmount');
+const sendBtn = document.getElementById('sendBtn');
+const custName = document.getElementById('custName');
+const custAddr = document.getElementById('custAddr');
+const STORE_PHONE = '3236739935'; // WhatsApp de Tienda Lyan
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+
+function openDrawer(){ overlay.classList.add('open'); drawer.classList.add('open'); }
+function closeDrawerFn(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
+cartFab.addEventListener('click', openDrawer);
+overlay.addEventListener('click', closeDrawerFn);
+closeDrawer.addEventListener('click', closeDrawerFn);
+
+function flyToCart(fromEl, icon){
+  const startRect = fromEl.getBoundingClientRect();
+  const endRect = cartFab.getBoundingClientRect();
+  const flyer = document.createElement('div');
+  flyer.className = 'flying-icon';
+  flyer.textContent = icon;
+  flyer.style.left = (startRect.left + startRect.width/2 - 13) + 'px';
+  flyer.style.top = (startRect.top + startRect.height/2 - 13) + 'px';
+  const dx = (endRect.left + endRect.width/2) - (startRect.left + startRect.width/2);
+  const dy = (endRect.top + endRect.height/2) - (startRect.top + startRect.height/2);
+  flyer.style.setProperty('--fly-to', `translate(${dx}px, ${dy}px)`);
+  document.body.appendChild(flyer);
+  flyer.addEventListener('animationend', ()=>{
+    flyer.remove();
+    cartFab.classList.add('pulse');
+    setTimeout(()=>cartFab.classList.remove('pulse'), 380);
+  });
+}
+
+function showToast(msg){
+  clearTimeout(toastTimer);
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 1400);
+}
+
+function renderCart(){
+  const ids = Object.keys(cart);
+  const totalItems = ids.reduce((s,id)=>s+cart[id],0);
+  const totalPrice = ids.reduce((s,id)=>{
+    const p = PRODUCTS.find(x=>x.id===id);
+    return s + p.price*cart[id];
+  },0);
+
+  cartCount.textContent = totalItems;
+  drawerSub.textContent = `${totalItems} producto${totalItems===1?'':'s'}`;
+  totalAmount.textContent = fmt(totalPrice);
+  sendBtn.disabled = totalItems===0;
+
+  if(ids.length===0){
+    drawerItems.innerHTML = `<div class="drawer-empty">Tu libreta está vacía.<br>Agrega productos del catálogo.</div>`;
+    return;
+  }
+
+  drawerItems.innerHTML = ids.map(id=>{
+    const p = PRODUCTS.find(x=>x.id===id);
+    const qty = cart[id];
+    return `
+      <div class="drawer-item">
+        <div>
+          <div class="di-name">${p.name}</div>
+          <div class="di-pres">${p.pres} · x${qty}</div>
+        </div>
+        <div class="di-right">
+          <div class="di-price">${fmt(p.price*qty)}</div>
+          <button class="di-remove" data-remove="${id}">&times;</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  drawerItems.querySelectorAll('[data-remove]').forEach(b=>{
+    b.addEventListener('click', ()=>{ delete cart[b.dataset.remove]; renderGrid(); renderCart(); });
+  });
+}
+
+sendBtn.addEventListener('click', ()=>{
+  const ids = Object.keys(cart);
+  if(ids.length===0) return;
+  const name = custName.value.trim() || '(sin nombre)';
+  const addr = custAddr.value.trim() || '(sin dirección)';
+
+  let lines = [];
+  lines.push(`*Pedido — Tienda Lyan*`);
+  lines.push(`Cliente: ${name}`);
+  lines.push(`Dirección: ${addr}`);
+  lines.push('');
+  let total = 0;
+  ids.forEach(id=>{
+    const p = PRODUCTS.find(x=>x.id===id);
+    const qty = cart[id];
+    const sub = p.price*qty;
+    total += sub;
+    lines.push(`• ${p.name} (${p.pres}) x${qty} — ${fmt(sub)}`);
+  });
+  lines.push('');
+  lines.push(`*Total: ${fmt(total)}*`);
+
+  const msg = encodeURIComponent(lines.join('\n'));
+  const waNumber = '57' + STORE_PHONE;
+  window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
+});
+
+// ---------- SEARCH ----------
+const searchInput = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearBtn');
+searchInput.addEventListener('input', e=>{
+  query = e.target.value;
+  clearBtn.classList.toggle('show', query.length>0);
+  renderGrid();
+});
+clearBtn.addEventListener('click', ()=>{
+  query=''; searchInput.value=''; clearBtn.classList.remove('show'); renderGrid();
+});
+
+// ---------- ADMIN: PIN + PANEL ----------
+// Cambia este PIN por el que quieras (4 dígitos). Es una protección básica de pantalla,
+// no seguridad real: cualquiera que abra el código fuente del archivo puede verlo.
+const ADMIN_PIN = '1234';
+
+const adminLink = document.getElementById('adminLink');
+const pinModal = document.getElementById('pinModal');
+const pinInput = document.getElementById('pinInput');
+const pinError = document.getElementById('pinError');
+const pinCancel = document.getElementById('pinCancel');
+const pinSubmit = document.getElementById('pinSubmit');
+const adminPanel = document.getElementById('adminPanel');
+const adminClose = document.getElementById('adminClose');
+const adminSummary = document.getElementById('adminSummary');
+const adminTable = document.getElementById('adminTable');
+
+adminLink.addEventListener('click', ()=>{
+  pinInput.value=''; pinError.textContent='';
+  pinModal.classList.add('open');
+  setTimeout(()=>pinInput.focus(), 50);
+});
+pinCancel.addEventListener('click', ()=> pinModal.classList.remove('open'));
+pinModal.addEventListener('click', e=>{ if(e.target===pinModal) pinModal.classList.remove('open'); });
+pinInput.addEventListener('keydown', e=>{ if(e.key==='Enter') pinSubmit.click(); });
+
+pinSubmit.addEventListener('click', ()=>{
+  if(pinInput.value === ADMIN_PIN){
+    pinModal.classList.remove('open');
+    renderAdmin();
+    adminPanel.classList.add('open');
+  } else {
+    pinError.textContent = 'PIN incorrecto';
+  }
+});
+adminClose.addEventListener('click', ()=> adminPanel.classList.remove('open'));
+
+function renderAdmin(){
+  let totalCost=0, totalPrice=0, totalProfit=0;
+  const rows = [];
+  CATS.forEach(cat=>{
+    rows.push(`<tr class="cat-row"><td colspan="6">${cat}</td></tr>`);
+    PRODUCTS.filter(p=>p.cat===cat).forEach(p=>{
+      const profit = p.price - p.cost;
+      const marginPct = ((profit / p.price) * 100).toFixed(1);
+      const markupPct = ((profit / p.cost) * 100).toFixed(1);
+      totalCost += p.cost; totalPrice += p.price; totalProfit += profit;
+      rows.push(`
+        <tr>
+          <td class="name-col">${p.name}</td>
+          <td>${p.pres}</td>
+          <td>${fmt(p.cost)}</td>
+          <td>${fmt(p.price)}</td>
+          <td class="profit-pos">${fmt(profit)}</td>
+          <td>${markupPct}% sobre costo</td>
+        </tr>`);
+    });
+  });
+
+  adminTable.innerHTML = `
+    <thead><tr>
+      <th>Producto</th><th>Presentación</th><th>Costo (compra)</th><th>Precio venta</th><th>Utilidad $</th><th>Utilidad %</th>
+    </tr></thead>
+    <tbody>${rows.join('')}</tbody>`;
+
+  adminSummary.innerHTML = `
+    <div class="stat"><div class="n">${PRODUCTS.length}</div><div class="l">Productos</div></div>
+    <div class="stat"><div class="n">${fmt(totalCost)}</div><div class="l">Costo total inventario</div></div>
+    <div class="stat"><div class="n">${fmt(totalPrice)}</div><div class="l">Valor venta total</div></div>
+    <div class="stat"><div class="n">${fmt(totalProfit)}</div><div class="l">Utilidad total</div></div>
+    <div class="stat"><div class="n">${((totalProfit/totalCost)*100).toFixed(1)}%</div><div class="l">Utilidad promedio sobre costo</div></div>
+  `;
+}
+
+// ---------- INIT ----------
+renderChips();
+renderGrid();
+renderCart();
+</script>
+</body>
+</html>
